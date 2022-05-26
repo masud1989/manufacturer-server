@@ -33,7 +33,7 @@ async function run(){
             res.send(products);
         })
 
-        //Show User=================================================================
+        //Show Users=================================================================
         app.get('/user', async(req,res) => {
             const query = {};
             const cursor = userCollection.find(query);
