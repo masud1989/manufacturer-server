@@ -1,6 +1,7 @@
 
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
@@ -21,11 +22,37 @@ async function run(){
         await client.connect();
         // console.log('DB Connected');
         const productCollection = client.db('manufacturer_portal').collection('products');
+        const userCollection = client.db('manufacturer_portal').collection('users');
+
+
+
         app.get('/product', async(req,res) => {
             const query = {};
             const cursor = productCollection.find(query);
             const products = await cursor.toArray();
             res.send(products);
+        })
+
+        //Show User=================================================================
+        app.get('/user', async(req,res) => {
+            const query = {};
+            const cursor = userCollection.find(query);
+            const users = await cursor.toArray();
+            res.send(users);
+        })
+
+        // Save user to database====================================================
+        app.put('/user/:email', async(req, res)=>{
+            const email = req.params.email;
+            const user = req.body;
+            const filter = {email: email};
+            const options = { upsert: true};
+            const updateDoc = {
+                $set: user,
+            };
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            const token = jwt.sign({email: email}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1h'})
+            res.send(result, token);
         })
 
         // Insert Product =====================================================
