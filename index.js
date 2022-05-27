@@ -23,6 +23,7 @@ async function run(){
         // console.log('DB Connected');
         const productCollection = client.db('manufacturer_portal').collection('products');
         const userCollection = client.db('manufacturer_portal').collection('users');
+        const reviewCollection = client.db('manufacturer_portal').collection('reviews');
 
 
 
@@ -31,6 +32,22 @@ async function run(){
             const cursor = productCollection.find(query);
             const products = await cursor.toArray();
             res.send(products);
+        })
+
+        // Insert Review =====================================================
+        app.post('/review', async(req, res)=>{
+            const newReview = req.body;
+            // console.log('adding new review');
+            const result = await reviewCollection.insertOne(newReview);
+            res.send(result);
+        })
+
+         //Show Review=================================================================
+         app.get('/reviews', async(req,res) => {
+            const query = {};
+            const cursor = reviewCollection.find(query);
+            const reviews = await cursor.toArray();
+            res.send(reviews);
         })
 
         //Show Users=================================================================
